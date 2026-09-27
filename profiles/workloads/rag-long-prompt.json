@@ -1,0 +1,9 @@
+{
+  "name": "rag-long-prompt",
+  "description": "RAG style: long context in, short answer out. Prefill dominated; exposes prefix caching and KV cache capacity.",
+  "prompt_tokens": 2048,
+  "output_tokens": 256,
+  "concurrency": [1, 4, 16, 32],
+  "max_seconds": 120,
+  "warmup_seconds": 30
+}

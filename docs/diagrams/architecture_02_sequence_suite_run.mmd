@@ -1,0 +1,40 @@
+%%{init: {"theme": "base", "themeVariables": {"fontSize": "13px", "background": "#002b36", "primaryColor": "#073642", "primaryTextColor": "#eee8d5", "primaryBorderColor": "#586e75", "lineColor": "#586e75", "secondaryColor": "#073642", "tertiaryColor": "#002b36", "noteBkgColor": "#073642", "noteTextColor": "#eee8d5", "noteBorderColor": "#586e75", "actorBkg": "#073642", "actorTextColor": "#eee8d5", "actorBorder": "#268bd2", "signalColor": "#93a1a1", "signalTextColor": "#eee8d5", "sequenceNumberColor": "#002b36", "activationBkgColor": "#073642", "activationBorderColor": "#b58900", "loopTextColor": "#eee8d5", "labelBoxBkgColor": "#073642", "labelBoxBorderColor": "#586e75", "labelTextColor": "#eee8d5"}}}%%
+sequenceDiagram
+    autonumber
+    participant Op as Operator
+    participant TF as Terraform / Linode API
+    participant Host as GPU host
+    participant Eng as bench-engine
+    participant GL as guidellm
+    participant SMI as gpu-sampler
+
+    Op->>TF: preflight.sh (token, plan, region, price)
+    Op->>TF: provision.sh (apply)
+    TF-->>Host: create instance + firewall, cloud-init user_data
+    Host->>Host: nvidia-open, Docker, toolkit, guidellm, reboot
+    Op->>Host: wait for bootstrap-complete and nvidia-smi
+    Op->>Host: sync.sh (rsync lib, host, profiles, analyze)
+    Op->>Host: run-remote.sh (tmux run-suite.sh)
+
+    loop for each engine profile
+        Host->>Eng: docker run --gpus all (profile image and args)
+        Host->>Eng: poll health path until 200
+        Eng-->>Host: /v1/models lists served model
+        Host->>Host: engine.sh meta -> meta.json (digest, precision, driver)
+        loop for each workload
+            Host->>Eng: warmup requests (30 s)
+            loop for each concurrency level x repeat
+                Host->>SMI: start gpu.csv
+                Host->>GL: run-bench.sh (concurrent streams, fixed tokens, fixed seconds)
+                GL->>Eng: streaming /v1/chat/completions
+                Eng-->>GL: tokens (TTFT, ITL measured client side)
+                GL-->>Host: guidellm.json
+                Host->>SMI: stop
+            end
+        end
+        Host->>Eng: docker rm -f
+    end
+
+    Op->>Host: fetch-results.sh
+    Op->>Op: cost.py (USD per 1M tokens) then report.py (REPORT.md)
+    Op->>TF: destroy.sh or budget-guard.sh (billing stops)

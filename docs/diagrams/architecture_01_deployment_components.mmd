@@ -1,0 +1,59 @@
+%%{init: {"theme": "base", "themeVariables": {"fontSize": "13px", "background": "#002b36", "primaryColor": "#073642", "primaryTextColor": "#eee8d5", "primaryBorderColor": "#586e75", "lineColor": "#586e75", "secondaryColor": "#073642", "tertiaryColor": "#002b36", "noteBkgColor": "#073642", "noteTextColor": "#eee8d5", "noteBorderColor": "#586e75"}}}%%
+flowchart LR
+    subgraph OP["Operator machine"]
+        TF["terraform/<br/>instance, firewall, cloud-init"]
+        BIN["bin/<br/>preflight, provision, sync,<br/>run-remote, fetch, destroy"]
+        GUARD["budget-guard.sh<br/>destroy after N hours"]
+        AN["analyze/<br/>cost.py, report.py"]
+        RES["results/&lt;run-id&gt;/<br/>REPORT.md, cost.csv"]
+    end
+
+    subgraph AK["Akamai Cloud region"]
+        FW["Cloud Firewall<br/>SSH from operator CIDR only"]
+        subgraph GPU["GPU instance (Ubuntu 24.04)"]
+            CI["cloud-init<br/>nvidia-open, Docker,<br/>container toolkit, guidellm"]
+            SUITE["host/run-suite.sh"]
+            ENG["bench-engine container<br/>vLLM | SGLang | TGI |<br/>Ollama | llama.cpp | NIM<br/>127.0.0.1:8000"]
+            GL["guidellm<br/>concurrent streams"]
+            SMI["gpu-sampler.sh<br/>nvidia-smi 1 Hz"]
+            HF["/var/lib/bench/hf-cache<br/>model weights"]
+            OUT["/var/lib/bench/results"]
+        end
+    end
+
+    API["Linode API v4"]
+    HUB["Hugging Face Hub<br/>NGC (NIM only)"]
+
+    BIN --> TF
+    TF -->|"LINODE_TOKEN"| API
+    API --> FW
+    API --> GPU
+    BIN -->|"rsync over SSH"| SUITE
+    SUITE -->|"start / stop"| ENG
+    SUITE --> GL
+    SUITE --> SMI
+    GL -->|"/v1/chat/completions"| ENG
+    ENG --> HF
+    HF -.->|"first pull"| HUB
+    GL --> OUT
+    SMI --> OUT
+    OUT -->|"fetch-results.sh"| RES
+    RES --> AN
+    GUARD -->|"terraform destroy"| API
+
+    classDef primary  fill:#073642,stroke:#268bd2,stroke-width:2px,color:#eee8d5
+    classDef success  fill:#073642,stroke:#859900,stroke-width:2px,color:#eee8d5
+    classDef warning  fill:#073642,stroke:#b58900,stroke-width:2px,color:#eee8d5
+    classDef error    fill:#073642,stroke:#dc322f,stroke-width:2px,color:#eee8d5
+    classDef external fill:#073642,stroke:#2aa198,stroke-width:2px,color:#eee8d5
+    classDef security fill:#073642,stroke:#6c71c4,stroke-width:2px,color:#eee8d5
+    classDef accent   fill:#073642,stroke:#cb4b16,stroke-width:2px,color:#eee8d5
+    classDef neutral  fill:#073642,stroke:#586e75,stroke-width:2px,color:#eee8d5
+
+    class TF,BIN,SUITE primary
+    class ENG,GL success
+    class SMI,HF,OUT,RES,AN warning
+    class GUARD error
+    class API,HUB external
+    class FW,CI security
+    class OP,AK,GPU neutral

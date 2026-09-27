@@ -1,0 +1,9 @@
+{
+  "name": "smoke",
+  "description": "Fast sanity run used by the smoke target. Not for reporting.",
+  "prompt_tokens": 64,
+  "output_tokens": 64,
+  "concurrency": [1, 4],
+  "max_seconds": 20,
+  "warmup_seconds": 5
+}

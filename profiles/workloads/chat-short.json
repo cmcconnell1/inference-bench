@@ -1,0 +1,9 @@
+{
+  "name": "chat-short",
+  "description": "Interactive chat: short prompt, medium answer. Latency-sensitive; TTFT and ITL matter more than aggregate throughput.",
+  "prompt_tokens": 128,
+  "output_tokens": 256,
+  "concurrency": [1, 4, 16, 64],
+  "max_seconds": 120,
+  "warmup_seconds": 30
+}

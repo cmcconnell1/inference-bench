@@ -1,0 +1,9 @@
+{
+  "name": "akamai-blog-200x200",
+  "description": "Replicates the request shape in Akamai's published RTX PRO 6000 Blackwell benchmark: 200 input tokens, 200 output tokens, concurrency 1, 100, 200. Concurrency 100 and 200 will saturate a 20 GB GPU with an 8B FP16 model; the sweep is kept so the saturation point is visible.",
+  "prompt_tokens": 200,
+  "output_tokens": 200,
+  "concurrency": [1, 8, 32, 100, 200],
+  "max_seconds": 120,
+  "warmup_seconds": 30
+}

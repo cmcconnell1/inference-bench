@@ -1,0 +1,12 @@
+{
+  "_comment": "Hourly USD list prices for Akamai Cloud GPU plans. Verify with: linode-cli linodes types --json or bin/preflight.sh. Prices are uniform across regions. Egress billed separately after the plan's included transfer.",
+  "_verified": "2026-09-27 via linode.com blog and techdocs; treat as approximate until preflight confirms",
+  "plans": {
+    "g2-gpu-rtx4000a1-s":  {"gpu": "RTX 4000 Ada", "gpus": 1, "vram_gb": 20,  "vcpu": 4,  "ram_gb": 16,  "hourly_usd": 0.52,  "monthly_usd": 350},
+    "g2-gpu-rtx4000a1-m":  {"gpu": "RTX 4000 Ada", "gpus": 1, "vram_gb": 20,  "vcpu": 8,  "ram_gb": 32,  "hourly_usd": 0.67,  "monthly_usd": 446},
+    "g2-gpu-rtx4000a1-l":  {"gpu": "RTX 4000 Ada", "gpus": 1, "vram_gb": 20,  "vcpu": 16, "ram_gb": 64,  "hourly_usd": 0.96,  "monthly_usd": 638},
+    "g2-gpu-rtx4000a1-xl": {"gpu": "RTX 4000 Ada", "gpus": 1, "vram_gb": 20,  "vcpu": 32, "ram_gb": 128, "hourly_usd": 1.53,  "monthly_usd": 1022},
+    "g1-gpu-rtx6000-1":    {"gpu": "Quadro RTX 6000", "gpus": 1, "vram_gb": 24, "vcpu": 8, "ram_gb": 32, "hourly_usd": 1.50, "monthly_usd": 1000},
+    "g3-gpu-rtxpro6000-blackwell-1": {"gpu": "RTX PRO 6000 Blackwell SE", "gpus": 1, "vram_gb": 96, "vcpu": 16, "ram_gb": 176, "hourly_usd": null, "monthly_usd": null, "_note": "limited availability; price not published in sources checked; preflight fills this in"}
+  }
+}

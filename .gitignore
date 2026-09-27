@@ -1,0 +1,29 @@
+# Terraform
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/terraform.tfvars
+terraform/*.auto.tfvars
+terraform/crash.log
+
+# Secrets and local env
+.env
+*.env.local
+*.pem
+*.key
+id_*
+!profiles/engines/*.env
+
+# Results and bundles (large, environment specific)
+results/*
+!results/.gitkeep
+*.tgz
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# macOS
+.DS_Store
